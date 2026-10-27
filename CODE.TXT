@@ -1,0 +1,151 @@
+clc;
+clear;
+close all;
+
+% TYRE PRESSURE VARIATION ASSESSMENT
+% Software-based project using sample data
+
+%% 1. SAMPLE DATA
+
+Temperature = [20 25 30 35 40 28 32 38];
+Vehicle_Load = [150 200 250 300 350 400 280 450];
+Duration = [10 20 30 40 50 60 70 80];
+Pressure = [32 32.5 33 34 35 29 31 36];
+
+%% 2. REFERENCE PRESSURE AND LIMITS
+
+Reference_Pressure = 32;
+Minimum_Pressure = 30;
+Maximum_Pressure = 34;
+
+%% 3. CALCULATE PRESSURE VARIATION
+
+Pressure_Variation = Pressure - Reference_Pressure;
+
+%% 4. ASSESS TYRE PRESSURE
+
+Number_of_Readings = length(Pressure);
+Assessment = cell(Number_of_Readings, 1);
+
+for i = 1:Number_of_Readings
+
+    if Pressure(i) < Minimum_Pressure
+        Assessment{i} = 'LOW PRESSURE';
+
+    elseif Pressure(i) > Maximum_Pressure
+        Assessment{i} = 'HIGH PRESSURE';
+
+    else
+        Assessment{i} = 'NORMAL';
+
+    end
+
+end
+
+%% 5. DISPLAY RESULTS IN A TABLE
+
+Results = table(Temperature', Vehicle_Load', Duration', ...
+    Pressure', Pressure_Variation', Assessment, ...
+    'VariableNames', {'Temperature_C', 'Vehicle_Load_kg', ...
+    'Duration_min', 'Pressure_PSI', ...
+    'Variation_PSI', 'Assessment'});
+
+disp('==============================================');
+disp(' TYRE PRESSURE VARIATION ASSESSMENT RESULTS');
+disp('==============================================');
+
+disp(Results);
+
+%% 6. DISPLAY SUMMARY
+
+Low_Count = sum(Pressure < Minimum_Pressure);
+Normal_Count = sum(Pressure >= Minimum_Pressure & ...
+                   Pressure <= Maximum_Pressure);
+High_Count = sum(Pressure > Maximum_Pressure);
+
+Average_Pressure = mean(Pressure);
+Average_Temperature = mean(Temperature);
+Average_Load = mean(Vehicle_Load);
+
+fprintf('\n========== PROJECT SUMMARY ==========\n');
+
+fprintf('Total Readings       : %d\n', Number_of_Readings);
+fprintf('Low Pressure Readings: %d\n', Low_Count);
+fprintf('Normal Readings      : %d\n', Normal_Count);
+fprintf('High Pressure Readings: %d\n', High_Count);
+
+fprintf('Average Pressure     : %.2f PSI\n', Average_Pressure);
+fprintf('Average Temperature  : %.2f C\n', Average_Temperature);
+fprintf('Average Vehicle Load : %.2f kg\n', Average_Load);
+
+%% 7. GRAPH 1: PRESSURE VS DURATION
+
+figure;
+
+plot(Duration, Pressure, '-o', ...
+    'LineWidth', 2, 'MarkerSize', 7);
+
+hold on;
+
+yline(Reference_Pressure, '--', 'Reference Pressure');
+yline(Minimum_Pressure, ':', 'Minimum Limit');
+yline(Maximum_Pressure, ':', 'Maximum Limit');
+
+xlabel('Duration (minutes)');
+ylabel('Tyre Pressure (PSI)');
+
+title('Tyre Pressure Variation Over Time');
+
+legend('Measured Pressure', 'Reference Pressure', ...
+    'Minimum Limit', 'Maximum Limit', ...
+    'Location', 'best');
+
+grid on;
+hold off;
+
+%% 8. GRAPH 2: TEMPERATURE VS PRESSURE
+
+figure;
+
+scatter(Temperature, Pressure, 80, 'filled');
+
+xlabel('Temperature (C)');
+ylabel('Tyre Pressure (PSI)');
+
+title('Temperature vs Tyre Pressure');
+
+grid on;
+
+%% 9. GRAPH 3: VEHICLE LOAD VS PRESSURE
+
+figure;
+
+scatter(Vehicle_Load, Pressure, 80, 'filled');
+
+xlabel('Vehicle Load (kg)');
+ylabel('Tyre Pressure (PSI)');
+
+title('Vehicle Load vs Tyre Pressure');
+
+grid on;
+
+%% 10. GRAPH 4: PRESSURE VARIATION
+
+figure;
+
+bar(1:Number_of_Readings, Pressure_Variation);
+
+xlabel('Reading Number');
+ylabel('Pressure Variation (PSI)');
+
+title('Pressure Variation from Reference Pressure');
+
+grid on;
+
+%% 11. SAVE RESULTS TO A CSV FILE
+
+writetable(Results, 'tyre_pressure_results.csv');
+
+disp(' ');
+disp('Results saved to tyre_pressure_results.csv');
+disp('Project completed successfully!');
